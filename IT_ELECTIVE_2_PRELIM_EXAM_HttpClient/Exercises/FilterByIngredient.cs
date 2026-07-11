@@ -1,3 +1,5 @@
+using System.Net;
+using System.Text.Json;
 namespace IT_ELECTIVE_2_PRELIM_EXAM_HttpClient.Exercises;
 
 // EXERCISE 5: GET Filter by Ingredient
@@ -19,6 +21,20 @@ public static class FilterByIngredient
         // TODO: Parse the response JSON
         // TODO: Assert the "meals" array has at least 1 item
 
-        throw new NotImplementedException();
+        var response = await client.GetAsync("https://themealdb.com/api/json/v1/1/filter.php?i=chicken_breast");
+
+        if (response.StatusCode != HttpStatusCode.OK)
+            throw new Exception("Expected status code 200 OK.");
+
+       
+        var body = await response.Content.ReadAsStringAsync();
+        using var document = JsonDocument.Parse(body);
+
+        
+        var meals = document.RootElement.GetProperty("meals");
+
+       
+        if (meals.ValueKind == JsonValueKind.Null || meals.GetArrayLength() < 1)
+            throw new Exception("No meals found with the specified ingredient.");
     }
 }
