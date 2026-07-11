@@ -1,3 +1,7 @@
+using System.Net;
+using System.Text;
+using System.Text.Json;
+
 namespace IT_ELECTIVE_2_PRELIM_EXAM_HttpClient.Exercises;
 
 // EXERCISE 6: POST Create Review
@@ -24,6 +28,28 @@ public static class CreateReview
         // TODO: Parse the response JSON
         // TODO: Assert the response has an "id" field with a value
 
-        throw new NotImplementedException();
+        string json = @"{
+            ""title"": ""Great Pasta!"",
+            ""body"": ""Loved this recipe"",
+            ""userId"": 1
+        }";
+
+        // Create StringContent
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        // Send POST request
+        var response = await client.PostAsync("https://jsonplaceholder.typicode.com/posts", content);
+
+        // Assert status code is 201 Created
+        if (response.StatusCode != HttpStatusCode.Created)
+            throw new Exception("Expected status code 201 Created.");
+
+        // Read and parse the response JSON
+        var body = await response.Content.ReadAsStringAsync();
+        using var document = JsonDocument.Parse(body);
+
+        // Assert the response contains an "id" field
+        if (!document.RootElement.TryGetProperty("id", out var id) || id.GetInt32() <= 0)
+            throw new Exception("Response does not contain a valid id.");
     }
 }
