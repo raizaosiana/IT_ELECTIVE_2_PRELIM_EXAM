@@ -1,3 +1,4 @@
+using System.Net;
 namespace IT_ELECTIVE_2_PRELIM_EXAM_HttpClient.Exercises;
 
 // EXERCISE 8: DELETE Remove Review
@@ -16,6 +17,10 @@ public static class DeleteReview
         // TODO: Send DELETE request to https://jsonplaceholder.typicode.com/posts/1
         // TODO: Assert status code is 200 OK
 
-        throw new NotImplementedException();
+        var response = await client.DeleteAsync("https://jsonplaceholder.typicode.com/posts/1");
+
+        // Assert status code is 200 OK
+        if (response.StatusCode != HttpStatusCode.OK)
+            throw new Exception("Expected status code 200 OK.");
     }
 }
