@@ -1,3 +1,8 @@
+using System.Net;
+using System.Text;
+using System.Text.Json;
+
+
 namespace IT_ELECTIVE_2_PRELIM_EXAM_HttpClient.Exercises;
 
 // EXERCISE 7: PUT Update Review
@@ -23,6 +28,31 @@ public static class UpdateReview
         // TODO: Parse the response JSON
         // TODO: Assert the title is "Updated Review"
 
-        throw new NotImplementedException();
+        string json = @"{
+            ""id"": 1,
+            ""title"": ""Updated Review"",
+            ""body"": ""Even better than before!"",
+            ""userId"": 1
+        }";
+
+        // Create StringContent
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        // Send PUT request
+        var response = await client.PutAsync("https://jsonplaceholder.typicode.com/posts/1", content);
+
+        // Assert status code is 200 OK
+        if (response.StatusCode != HttpStatusCode.OK)
+            throw new Exception("Expected status code 200 OK.");
+
+        // Read and parse the response JSON
+        var body = await response.Content.ReadAsStringAsync();
+        using var document = JsonDocument.Parse(body);
+
+        // Assert the title is "Updated Review"
+        var title = document.RootElement.GetProperty("title").GetString();
+
+        if (title != "Updated Review")
+            throw new Exception("Title was not updated correctly.");
     }
 }
