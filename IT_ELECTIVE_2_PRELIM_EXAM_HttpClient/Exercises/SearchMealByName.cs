@@ -1,3 +1,5 @@
+using System.Net;
+using System.Text.Json;
 namespace IT_ELECTIVE_2_PRELIM_EXAM_HttpClient.Exercises;
 
 // EXERCISE 2: GET Search by Name
@@ -19,7 +21,21 @@ public static class SearchMealByName
         // TODO: Assert status code is 200 OK
         // TODO: Parse the response JSON
         // TODO: Assert that the "meals" array is not null and has at least 1 item
+        // Send GET request
+        var response = await client.GetAsync("https://themealdb.com/api/json/v1/1/search.php?s=Arrabiata");
 
-        throw new NotImplementedException();
+        // Assert status code is 200 OK
+        if (response.StatusCode != HttpStatusCode.OK)
+            throw new Exception("Expected status code 200 OK.");
+
+        // Read and parse the response JSON
+        var body = await response.Content.ReadAsStringAsync();
+        using var document = JsonDocument.Parse(body);
+
+        // Assert that the "meals" array is not null and has at least 1 item
+        var meals = document.RootElement.GetProperty("meals");
+
+        if (meals.ValueKind == JsonValueKind.Null || meals.GetArrayLength() < 1)
+            throw new Exception("No meals were found.");
     }
 }
