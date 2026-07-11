@@ -1,3 +1,4 @@
+using System.Net;
 namespace IT_ELECTIVE_2_PRELIM_EXAM_HttpClient.Exercises;
 
 // EXERCISE 1: GET Random Meal
@@ -21,6 +22,18 @@ public static class GetRandomMeal
         // TODO: Assert status code is 200 OK
         // TODO: Assert response body is not null or empty
 
-        throw new NotImplementedException();
+        // Send GET request
+        var response = await client.GetAsync("https://themealdb.com/api/json/v1/1/random.php");
+
+        // Read response body
+        var body = await response.Content.ReadAsStringAsync();
+
+        // Assert status code is 200 OK
+        if (response.StatusCode != HttpStatusCode.OK)
+            throw new Exception("Expected status code 200 OK.");
+
+        // Assert response body is not null or empty
+        if (string.IsNullOrWhiteSpace(body))
+            throw new Exception("Response body is empty.");
     }
 }
