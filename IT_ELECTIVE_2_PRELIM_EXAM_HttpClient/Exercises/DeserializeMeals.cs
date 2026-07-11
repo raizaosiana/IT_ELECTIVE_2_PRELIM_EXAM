@@ -1,3 +1,6 @@
+using System.Net;
+using System.Text.Json;
+
 namespace IT_ELECTIVE_2_PRELIM_EXAM_HttpClient.Exercises;
 
 // EXERCISE 10: GET Deserialize Multiple Meals
@@ -32,6 +35,27 @@ public static class DeserializeMeals
         // TODO: Assert the array has more than 0 items
         // TODO: Loop through and print each meal's strMeal
 
-        throw new NotImplementedException();
+        var response = await client.GetAsync("https://themealdb.com/api/json/v1/1/search.php?f=a");
+
+        // Assert status code is 200 OK
+        if (response.StatusCode != HttpStatusCode.OK)
+            throw new Exception("Expected status code 200 OK.");
+
+        // Read and parse the response JSON
+        var body = await response.Content.ReadAsStringAsync();
+        using var document = JsonDocument.Parse(body);
+
+        // Get the meals array
+        var meals = document.RootElement.GetProperty("meals");
+
+        // Assert the array has more than 0 items
+        if (meals.ValueKind == JsonValueKind.Null || meals.GetArrayLength() == 0)
+            throw new Exception("No meals found.");
+
+        // Loop through and print each meal's name
+        foreach (var meal in meals.EnumerateArray())
+        {
+            Console.WriteLine(meal.GetProperty("strMeal").GetString());
+        }
     }
 }
